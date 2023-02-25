@@ -1,0 +1,164 @@
+.preview {
+  flex: 1;
+  background-color: $color-blue;
+  color: $color-white;
+  border-radius: $border-radius;
+  box-shadow: $shadow;
+  max-width: 602px;
+  transition: all 0.2s ease;
+}
+
+.preview.active {
+  max-width: 500px;
+  transition: all 0.2s ease;
+}
+
+.preview__wrapper {
+  padding: 30px 24px;
+}
+
+.preview__row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+
+  & label {
+    text-align: center;
+  }
+
+  & p {
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 20px;
+  }
+
+  & input {
+    max-width: 80px;
+    background-color: $color-white;
+    border: none;
+    padding: 5px;
+    border-radius: $fields-radius;
+    margin-top: 4px;
+    color: #000000;
+    text-align: center;
+  }
+}
+
+.preview__title {
+  padding-bottom: 30px;
+
+}
+
+.picture {
+  & img {
+    max-width: 190px;
+  }
+}
+
+.preview__door {
+  & .preview__title {
+    margin-top: 40px;
+  }
+}
+
+.list li input.success {
+  background-color: $color-blue;
+  color: $color-white
+}
+
+.type-door {
+  & label {
+    cursor: pointer;
+  }
+}
+
+.tabs-list {
+  display: flex;
+  align-items: center;
+  background-color: $color-white;
+  min-height: 2.5rem;
+  border-radius: 0.8rem;
+  box-shadow: $shadow;
+  margin-bottom: 1rem;
+  overflow: hidden;
+  position: relative;
+}
+
+.tabs {
+  padding: 0.2rem;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  cursor: pointer;
+  position: relative;
+  z-index: 2;
+
+  &.active {
+    color: $color-white;
+  }
+}
+
+.tabs-indicator {
+  position: absolute;
+  height: 90%;
+  top: 5%;
+  width: 50%;
+  background-color: $color-blue;
+  z-index: 1;
+  transition: left .3s ease;
+  left: 0;
+  border-radius: 0.8rem;
+  box-shadow: $shadow;
+  border: 1px solid #ccc;
+
+  &.active {
+    left: 50%;
+    transition: left .3s ease;
+  }
+}
+
+.covering-title {
+  text-align: center;
+}
+
+.covering-type-list {
+  margin: 1rem 0;
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+}
+
+.covering-item {
+  padding: 5px 20px;
+  border-radius: 0.3rem;
+  box-shadow: $shadow;
+  display: inline-block;
+  font-size: .8rem;
+  flex: 1;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  text-align: center;
+  align-items: center;
+  flex-direction: column;
+  padding: 10px 5px;
+  transition: all .1s ease;
+  gap: 10px;
+  line-height: 1;
+
+  &.active {
+    background-color: $color-blue;
+    color: $color-white;
+    transition: transform .15s ease;
+    transform: scale(1.05);
+  }
+}
+
+.services__list {
+  & li:first-child {
+    border: none;
+  }
+}

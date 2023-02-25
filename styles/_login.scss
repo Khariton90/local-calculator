@@ -1,0 +1,15 @@
+.login-page {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-form {
+    width: 300px;
+    height: 500px;
+    border-radius: $border-radius;
+    box-shadow: $shadow;
+    background-color: $color-white;
+}

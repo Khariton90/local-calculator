@@ -1,0 +1,662 @@
+@import "variables.scss";
+@import "services.scss";
+@import "preview.scss";
+@import "header.scss";
+@import "map.scss";
+@import "cart.scss";
+@import "login.scss";
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap");
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: $color-bg;
+  margin: 0;
+  font-family: "Montserrat", sans-serif;
+  color: $text-color;
+}
+
+ul {
+  list-style-type: none;
+}
+
+.main {
+  padding: 0 47px 5px 0;
+  display: flex;
+  transition: all 0.2s ease;
+}
+
+.main.active {
+  grid-template-columns: 300px 1fr;
+  transition: all 0.4 ease;
+}
+
+.calc {
+  display: flex;
+  max-width: 1920px;
+  width: 100%;
+  margin: 80px auto 30px;
+  gap: 20px;
+  justify-content: center;
+  max-height: 1000px;
+}
+
+.calc__wrapper {
+  border: 2px solid $color-blue;
+  border-radius: $border-radius;
+  padding: 15px 35px 0;
+  flex: 1;
+  max-width: 1152px;
+}
+
+.calc__title {
+  font-size: 30px;
+}
+
+.calc__row {
+  display: flex;
+  gap: 25px;
+  height: 90%;
+}
+
+.calc__title {
+  margin-bottom: 18px;
+}
+
+.form {
+  background-color: $color-white;
+  border-radius: $border-radius;
+  padding: 24px 24px 48px 24px;
+  box-shadow: $shadow;
+  width: 308px;
+}
+
+.form.active {
+  width: 260px;
+}
+
+.form__fieldset {
+  border: none;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 12px;
+  position: relative;
+  border: 1px solid #ccc;
+  padding: 0 10px;
+  border-radius: $fields-radius;
+
+  & label {
+    position: relative;
+    margin-bottom: 18px;
+  }
+
+  & input,
+  & select {
+    border-radius: $fields-radius;
+    border: 1px solid #d2d2d2;
+    padding: 5px;
+  }
+
+  & select {
+    margin-bottom: 14px;
+  }
+
+  & input[type="number"] {
+    margin: 2px 0 0 0;
+    width: 100%;
+    height: 30px;
+  }
+
+  & select {
+    height: 30px;
+  }
+
+  & .fieldset__legend {
+    font-weight: 500;
+    font-size: 20px;
+    margin-bottom: 8px;
+
+    & p {
+      font-weight: 400;
+      font-size: 12px;
+    }
+  }
+
+  & small {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 11px;
+    color: $color-red;
+    position: absolute;
+    bottom: -17px;
+    left: 0;
+  }
+
+  & p {
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+}
+
+input[type="number"]:focus {
+  outline: none;
+  border: 1px solid $color-blue;
+}
+
+.type-door {
+  & span {
+    font-weight: 400;
+    font-size: 14px;
+  }
+}
+
+.doorone,
+.door {
+  & span {
+    color: #9d9d9d;
+    font-size: 16px;
+  }
+}
+
+.error {
+  color: $color-red;
+  animation: bounce 0.2s ease;
+
+  & input {
+    border: 1px solid $color-red;
+  }
+}
+
+@keyframes bounce {
+  0% {
+    transform: translateX(0px);
+  }
+
+  20% {
+    transform: translateX(-5px);
+  }
+
+  40% {
+    transform: translateX(0px);
+  }
+
+  60% {
+    transform: translateX(-5px);
+  }
+
+  80% {
+    transform: translateX(0px);
+  }
+
+  100% {
+    transform: translateX(-5px);
+  }
+}
+
+select:disabled {
+  background-color: #eeeeee;
+}
+
+.list li.success {
+  border-bottom: 1px solid #3692fd;
+}
+
+label p span {
+  font-weight: 500;
+}
+
+input[type="radio"] {
+  position: relative;
+
+  &::before {
+    content: "";
+    position: absolute;
+    left: -2px;
+    top: -2px;
+    width: 13px;
+    height: 13px;
+    border-radius: $fields-radius;
+    border: 2px solid #9d9d9d;
+    opacity: 1;
+    background-color: $color-white;
+  }
+
+  &:checked:after {
+    content: "";
+    position: absolute;
+    left: 2px;
+    top: 2px;
+    width: 9px;
+    height: 9px;
+    background-color: $color-blue;
+    border-radius: 2px;
+  }
+}
+
+.material {
+  width: 100%;
+  height: 30px;
+  border-radius: $fields-radius;
+  margin-top: 4px;
+}
+
+.add-cart-btn {
+  width: 100px;
+  height: 30px;
+  border-radius: $fields-radius;
+  background-color: $color-blue;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: $color-white;
+  text-decoration: none;
+  font-size: 12px;
+  float: right;
+  box-shadow: $shadow;
+  transition: opacity 0.1s ease;
+  border: none;
+  cursor: pointer;
+
+  &.disabled {
+    background-color: #767676;
+    opacity: .5;
+    cursor: auto;
+  }
+}
+
+.print-btn:hover {
+  opacity: 0.9;
+  transition: opacity 0.3s ease;
+}
+
+.hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.leaflet-control-attribution {
+  display: none;
+}
+
+.result-page {
+  & li {
+    margin-bottom: 20px;
+  }
+}
+
+.modal {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  position: fixed;
+  z-index: 1002;
+  display: flex;
+  visibility: hidden;
+  overflow-y: auto;
+  flex-direction: column;
+  opacity: 0;
+  background-color: rgba(0, 0, 0, .8);
+  -webkit-transition: opacity .1s cubic-bezier(.55, 0, .1, 1), visibility .2s cubic-bezier(.55, 0, .1, 1), -webkit-transform .2s cubic-bezier(.55, 0, .1, 1);
+  transition: opacity .1s cubic-bezier(.55, 0, .1, 1), transform .2s cubic-bezier(.55, 0, .1, 1), visibility .2s cubic-bezier(.55, 0, .1, 1);
+  transition: opacity .1s cubic-bezier(.55, 0, .1, 1), transform .2s cubic-bezier(.55, 0, .1, 1), visibility .2s cubic-bezier(.55, 0, .1, 1), -webkit-transform .2s cubic-bezier(.55, 0, .1, 1);
+  -webkit-transform: scale(1.2);
+  transform: scale(1.2);
+  pointer-events: none;
+  -webkit-overflow-scrolling: touch;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.modal.isActive {
+  visibility: visible;
+  opacity: 1;
+  background: rgba(84, 77, 77, .65);
+  -webkit-transform: scale(1);
+  transform: scale(1);
+  pointer-events: auto;
+}
+
+.modal__wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  justify-content: center;
+  width: 100%;
+  min-height: 100%;
+  padding: 60px 40px;
+}
+
+.modal__overlay {
+  top: 0;
+  left: 0;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.modal__content {
+  position: relative;
+  overflow: hidden;
+  width: 430px;
+  padding: 40px;
+  border-radius: 4px;
+  background-color: #fefafa;
+  -webkit-box-shadow: 0 5px 6px rgba(63, 63, 63, 0.2);
+  box-shadow: 0 5px 6px rgba(63, 63, 63, 0.2);
+
+  &.title {
+    padding: 0;
+    font-family: "Open Sans", "Arial", sans-serif;
+    font-weight: 700;
+    line-height: 1.2;
+    color: inherit;
+  }
+
+  &.modal__info {
+    display: flex;
+  }
+
+  &.modal__button-container {
+    display: flex;
+    flex-grow: 1;
+    justify-content: start;
+    padding-top: 20px;
+  }
+
+  &.button-cross {
+    width: 14px;
+    height: 14px;
+    padding: 0;
+    color: #585757;
+    border: 0;
+    background-color: transparent;
+    cursor: pointer;
+    -webkit-transition: color 0.3s ease;
+    transition: color 0.3s ease;
+  }
+}
+
+.title--medium {
+  font-size: 18px;
+  letter-spacing: 0.02em;
+}
+
+.button--big {
+  font-size: 16px;
+  height: 40px;
+  border-radius: $fields-radius;
+}
+
+.button--blue {
+  border-color: $color-blue;
+  background-color: $color-blue;
+  cursor: pointer;
+  color: $color-white;
+}
+
+.modal__button-container .modal__button--add {
+  min-width: 225px;
+  margin: 0 auto;
+}
+
+.modal__button-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.modal__info-wrapper {
+  & p {
+    margin: 5px 0;
+  }
+}
+
+.colorBlue {
+  color: $color-blue;
+}
+
+.button-cross {
+  width: 14px;
+  height: 14px;
+  padding: 0;
+  color: #585757;
+  border: 0;
+  background-color: transparent;
+  cursor: pointer;
+  -webkit-transition: color .3s ease;
+  transition: color .3s ease;
+}
+
+.modal__close-btn {
+  top: 23px;
+  right: 23px;
+  position: absolute;
+}
+
+[type=button],
+[type=reset],
+[type=submit],
+button {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+.button-cross {
+  width: 14px;
+  height: 14px;
+  padding: 0;
+  color: #585757;
+  border: 0;
+  background-color: transparent;
+  cursor: pointer;
+  -webkit-transition: color .3s ease;
+  transition: color .3s ease;
+}
+
+.button-cross__icon::before {
+  -webkit-transform: rotate(45deg);
+  transform: rotate(45deg);
+}
+
+.button-cross__icon::after {
+  -webkit-transform: rotate(-45deg);
+  transform: rotate(-45deg);
+}
+
+.button-cross__icon::after,
+.button-cross__icon::before {
+  top: 6.5px;
+  left: -1.5px;
+  position: absolute;
+  width: 17px;
+  height: 1px;
+  background-color: currentColor;
+  content: "";
+}
+
+.modal__item-count {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  margin-top: 20px;
+
+  & input {
+    height: 30px;
+    width: 40px;
+    appearance: none;
+    padding: 5px;
+    border: 1px solid $color-blue;
+    border-radius: $fields-radius;
+    text-align: center;
+    box-shadow: $shadow;
+  }
+
+  & span {
+    width: 40px;
+    height: 30px;
+    border-radius: $fields-radius;
+    background-color: $color-blue;
+    color: $color-white;
+    font-size: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: $shadow;
+  }
+}
+
+.toggle-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+// Tweak these to change the style of the toggle
+$toggle-background-color-on: $color-blue;
+$toggle-background-color-off: $color-blue;
+$toggle-control-color: white;
+$toggle-width: 40px;
+$toggle-height: 20px;
+$toggle-gutter: 2px;
+$toggle-radius: 50%;
+$toggle-control-speed: .15s;
+$toggle-control-ease: ease-in;
+
+// These are our computed variables
+// change at your own risk.
+$toggle-radius: $toggle-height / 2;
+$toggle-control-size: $toggle-height - ($toggle-gutter * 2);
+
+.toggle-control {
+  display: block;
+  position: relative;
+  padding-left: $toggle-width;
+  cursor: pointer;
+  font-size: 22px;
+  user-select: none;
+
+  input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+  }
+
+  input:checked~.control {
+    background-color: $toggle-background-color-on;
+
+    &:after {
+      left: $toggle-width - $toggle-control-size - $toggle-gutter;
+    }
+  }
+
+  .control {
+    position: absolute;
+    top: -10px;
+    left: 0;
+    height: $toggle-height;
+    width: $toggle-width;
+    border-radius: $toggle-radius;
+    background-color: $toggle-background-color-off;
+    transition: background-color $toggle-control-speed $toggle-control-ease;
+
+    &:after {
+      content: "";
+      position: absolute;
+      left: $toggle-gutter;
+      top: $toggle-gutter;
+      width: $toggle-control-size;
+      height: $toggle-control-size;
+      border-radius: $toggle-radius;
+      background: $toggle-control-color;
+      transition: left $toggle-control-speed $toggle-control-ease;
+    }
+  }
+}
+
+.cart-item {
+  background-color: $color-white;
+  box-shadow: $shadow;
+  border-radius: $fields-radius;
+  padding: 10px 20px;
+  margin-bottom: 20px;
+}
+
+.cart-item__info {
+  & p {
+    margin: 10px 0;
+  }
+}
+
+.cart-item__message {
+  color: $color-red;
+  margin: 10px 0;
+}
+
+.cart-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.cart-nothing {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  background: url('./../img/cart.png') no-repeat center center;
+  background-size: 300px;
+  padding: 3rem;
+}
+
+.cart-item__services {
+  & .cart-item__services-title {
+    margin: 10px 0;
+  }
+}
+
+.cart-item__price {
+  margin: 10px 0;
+}
+
+.btn-cart-back {
+  border: none;
+  padding: 15px 30px;
+  border-radius: $fields-radius;
+  background-color: $color-blue;
+  color: $color-white;
+  cursor: pointer;
+  font-weight: bold;
+  box-shadow: $shadow;
+}
+
+#app.dark {
+  & .leaflet-tile {
+    filter: hue-rotate(180deg) invert(100%);
+  }
+}
+
+.nav {
+  position: fixed;
+  top: 80px;
+}
+
+.wrapper {
+  width: 100%;
+  height: 100%;
+  max-height: 1000px;
+  margin: 0 auto;
+}

@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="styles/leaflet.css" />
+  <link rel="stylesheet" href="styles/style.css">
+  <title>Двери-калькулятор</title>
+</head>
+
+<style>
+  [v-cloak] {
+    display: none;
+  }
+
+  ;
+</style>
+
+<body>
+  <div class="wrapper">
+    <div id="app" :class="{ main: page !== 'LOGIN', active: menu, dark: hours }" v-cloak>
+      <!-- Логин -->
+      <div class="login-page" v-if="page === 'LOGIN'">
+        <form action="" class="login-form">
+          <h2>Войти</h2>
+          <label for="">
+            <input type="text" required>
+          </label>
+        </form>
+      </div>
+      <header class="header" v-if="page !== 'LOGIN'">
+        <div class="header__burger" :class="{active: menu}" @click="menu = !menu">
+          <span></span>
+        </div>
+        <div class="header__container">
+          <a class="header__cart" @click.prevent="navigate" title="Перейти в корзину">
+            <img src="img/card.5828b65d.svg" data-link="CART" alt="cart-logo">
+            <span v-if="cart.length" class="cart__price" data-link="CART">{{ cart.length }}</span>
+          </a>
+          <span class="cart__amount" data-link="CART" @click.prevent="navigate"
+            v-if="cartAmount">{{priceFormat(cartAmount)}}</span>
+        </div>
+        <!-- <div class="card" @click="navigate">
+        <span data-link="RESULT">Корзина</span>
+      </div> -->
+        <!-- <div>
+        <button @click="addCalculate" :disabled="$v.form.$invalid">Добавить</button>
+      </div> -->
+      </header>
+      <aside class="sidebar" :class="{active: menu}" v-if="page !== 'LOGIN'">
+        <nav class="nav" :class="{active: menu}">
+          <ul class="nav__menu" @click="navigate">
+            <li :class="{active: page === 'INTERRIOR'}"><span data-link="INTERRIOR" title="Межкомнатные двери"><img
+                  data-link="INTERRIOR" src="./img/home.svg" alt="home"></span><a class="nav__link"
+                :class="{active: page === 'INTERRIOR'}" data-link="INTERRIOR">Межкомнатные двери</a>
+            </li>
+            <!-- <li :class="{active: page === 'EXTERRIOR'}"><span data-link="EXTERRIOR" title="Входные двери"><img
+                data-link="EXTERRIOR" src="./img/exit.svg" alt="exit"></span> <a class="nav__link"
+              :class="{active: page === 'EXTERRIOR'}" data-link="EXTERRIOR">Входные двери</a></li> -->
+            <li :class="{active: page === 'MAP'}"><span data-link="MAP" title="Карта"><img data-link="MAP"
+                  src="./img/marker.svg" alt="marker"></span><a class="nav__link" :class="{active: page === 'MAP'}"
+                data-link="MAP">Карта</a>
+            </li>
+          </ul>
+        </nav>
+      </aside>
+      <div :class="{calc: page !== 'CART', cart: page === 'CART'}" v-if="page !== 'LOGIN'">
+        <div class="cart-page" v-show="page === 'CART'">
+          <div class="cart-wrapper" v-if="cart.length">
+            <div class="cart-header">
+              <!-- <h1 class="cart__title">Заказ ID #526429</h1> -->
+              <div class="cart__cookies">
+                <a data-link="INTERRIOR" @click.prevent="navigate">Калькулятор</a> /
+                <a data-link="CART" @click.prevent="navigate">Корзина</a>
+              </div>
+            </div>
+            <div class="cart-aside">
+              <div class="cart-aside-wrapper">
+                <div class="cart-user">
+                  <!-- <div class="cart-user__avatar">
+                    <img src="./img/avatar.png" alt="">
+                  </div>
+                  <h2 class="cart-user__fullname">Евгений Харитонов</h2>
+                  <p class="cart-user__role">Менеджер</p> -->
+                  <div class="cart-annotate">
+                    <p><b>Для качественной установки необходимо провести ЗАМЕРЫ.</b></p>
+
+                    <p>Если заказчик производит замер самостоятельно,
+                      то несет полную ответственность за наличие материала и корректность указанных размеров.
+                      Если монтаж невозможно провести по причинам, независящим от исполнителя, то оформляется ложный вызов.</p>
+
+                      <div class="cart-annotate__footer">
+                        <div class="delivery-image">
+                          <img src="img/delivery.svg" alt="">
+                        </div>
+                        <p>Ложный вызов <br>1000 рублей</p>
+                      </div>
+                  </div>
+                </div>
+                <div class="cart-notes">
+                  <div>
+                    <h3 class="cart-notes__title">Примечания к заказу</h3>
+                    <div class="cart-notes__wrapper">
+                      <div class="cart-notes__progress">
+                        <span></span><span></span><span></span><span></span>
+                      </div>
+                      <ul class="cart-notes__list">
+                        <li>
+                          <p>Расчет</p>
+                          <p>Расчет не учитывает всех аспектов</p>
+                        </li>
+                        <li>
+                          <p>Замер</p>
+                          <p>Замер в течении 3-х дней</p>
+                        </li>
+                        <li>
+                          <p>Выезд</p>
+                          <p>С момента оформления до 10 дней</p>
+                        </li>
+                        <li>
+                          <p>Установка</p>
+                          <p>До 4-х дверей за один день</p>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="cart-main">
+              <div class="cart-list-item list-item">
+                <div class="list-item__header">
+                  <span>Тип установки</span>
+                  <span>Проём</span>
+                  <span>Цена</span>
+                  <span>Итого</span>
+                </div>
+                <div class="list-item__body">
+                  <!-- Карточка!!!!!!!!!!!!!!!!!!  -->
+                  <div class="cart__item-wrapper" v-for="item in cart">
+                    <div class="cart__item">
+                      <div class="cart__item-image">
+                        <img :src="item.image" alt="">
+                      </div>
+                      <div class="cart__item-description">
+                        <p class="cart__item-preview">Монтаж</p>
+                        <p class="cart__item-title">{{item.typeRepairDoor}}</p>
+                        <p class="cart__item-count">(6 дополнительных услуг)</p>
+                      </div>
+                    </div>
+                    <div class="cart__item-qty">
+                      {{ item.doorone.width }} мм
+                    </div>
+                    <div class="cart__item-price">
+                      {{ priceFormat(item.amountForm.covering) }}
+                    </div>
+                    <div class="cart__item-amount">
+                      <span>{{ priceFormat(item.total) }}</span>
+                      <a class="cart-item__remove" title="Удалить"><img src="img/x-circle.svg" alt=""
+                          @click="deleteCartItem(item.id)"></a>
+                    </div>
+                  </div>
+                </div>
+                <div class="list-item__map" v-if="page === 'CART'">
+                  <div class="cart-map">
+                    <l-map @update="centerUpdated" ref="myMap" style="width: 100%; height: 320px;"
+                      :center="marker.position" :zoom="9" @ready="doSomethingOnReady()" :min-zoom="mapOptions.minZoom"
+                      :max-zoom="mapOptions.maxZoom" @click="mapClick($event, polygons.polygon1);">
+                      <l-tile-layer :url="url" :attribution="attribution"
+                        style="filter: hue-rotate(180deg) invert(100%);"></l-tile-layer>
+                      <l-circle :lat-lng="circle.center" :radius="circle.radius" :color="circle.color"
+                        :fill-color="circle.fillColor" @click="getPolygon(null, $event)"></l-circle>
+                      <l-polygon :lat-lngs="polygons.polygon.latlngs" :color="polygons.polygon.color"
+                        :fill-color="polygons.polygon.fillColor"
+                        @click="getPolygon(polygons.polygon, $event)"></l-polygon>
+
+                      <l-polygon :lat-lngs="polygons.polygon2.latlngs" :color="polygons.polygon2.color"
+                        :fill-color="polygons.polygon2.fillColor"
+                        @click="getPolygon(polygons.polygon2, $event)"></l-polygon>
+
+                      <l-polygon :lat-lngs="polygons.polygon3.latlngs" :color="polygons.polygon3.color"
+                        :fill-color="polygons.polygon3.fillColor"
+                        @click="getPolygon(polygons.polygon3, $event)"></l-polygon>
+
+                      <l-polygon :lat-lngs="polygons.polygon4.latlngs" :color="polygons.polygon4.color"
+                        :fill-color="polygons.polygon4.fillColor"
+                        @click="getPolygon(polygons.polygon4, $event)"></l-polygon>
+
+                      <l-polygon :lat-lngs="polygons.polygon5.latlngs" :color="polygons.polygon5.color"
+                        :fill-color="polygons.polygon5.fillColor"
+                        @click="getPolygon(polygons.polygon5, $event)"></l-polygon>
+
+                      <l-polygon :lat-lngs="polygons.polygon6.latlngs" :color="polygons.polygon6.color"
+                        :fill-color="polygons.polygon6.fillColor"
+                        @click="getPolygon(polygons.polygon6, $event)"></l-polygon>
+
+                      <l-marker :lat-lng="marker.position" :lat-lng.sync="marker.position">
+                        <l-icon :icon-size="dynamicSize" :icon-anchor="dynamicAnchor" :icon-url="dinamicPin" />
+                      </l-marker>
+                    </l-map>
+                  </div>
+                </div>
+                <div class="list-item__header cart-total__header">
+                  <span>Общий расчет</span>
+                  <span>Количество</span>
+                  <span>Цена</span>
+                  <span>Итого</span>
+                </div>
+                <div class="cart-total__body">
+                  <div class="cart__item-wrapper" v-if="zone.price">
+                    <p class="cart__item">Монтаж за пределами первой зоны</p>
+                    <p class="cart__item-qty">{{ zone.price / 400 }} ед.</p>
+                    <p class="cart__item-price"><span>400,00 ₽</span></p>
+                    <p class="cart__item-amount"><span>{{priceFormat(zone.price)}}</span></p>
+                  </div>
+                  <div class="cart__item-wrapper" v-if="finalAmount.oneDoors">
+                    <p class="cart__item">Установка одной межкомнатной двери / одинарной раздвижной двери</p>
+                    <p class="cart__item-qty">{{ finalAmount.oneDoors }} ед.</p>
+                    <p class="cart__item-price"><span>3500,00 ₽</span></p>
+                    <p class="cart__item-amount"><span>{{priceFormat(finalAmount.oneDoors * 3500)}}</span></p>
+                  </div>
+                  <div class="cart__item-wrapper" v-if="finalAmount.doubleDoors">
+                    <p class="cart__item">Установка межкомнатных дверей (от 2-х дверей)</p>
+                    <p class="cart__item-qty">{{ finalAmount.doubleDoors }} ед.</p>
+                    <p class="cart__item-price"><span>2950,00 ₽</span></p>
+                    <p class="cart__item-amount"><span>{{priceFormat(finalAmount.doubleDoors * 2950)}}</span></p>
+                  </div>
+                  <div class="cart__item-wrapper" v-if="finalAmount.enamelAndWoodDoors">
+                    <p class="cart__item">Установка дверей из массива и эмалированных</p>
+                    <p class="cart__item-qty">{{ finalAmount.enamelAndWoodDoors }} ед.</p>
+                    <p class="cart__item-price"><span>3900,00 ₽</span></p>
+                    <p class="cart__item-amount"><span>{{priceFormat(finalAmount.enamelAndWoodDoors * 3900)}}</span></p>
+                  </div>
+                  <div class="cart__item-wrapper" v-if="finalAmount.expandOther">
+                    <p class="cart__item">Расширение проема</p>
+                    <p class="cart__item-qty">{{ finalAmount.expandOther / 750 }} м.п.</p>
+                    <p class="cart__item-price"><span>750,00 ₽</span></p>
+                    <p class="cart__item-amount"><span>{{priceFormat(finalAmount.expandOther)}}</span></p>
+                  </div>
+                  <div class="cart__item-wrapper" v-if="finalAmount.expandBeton">
+                    <p class="cart__item">Расширение бетонного проема</p>
+                    <p class="cart__item-qty">{{ finalAmount.expandBeton / 1000 }} м.п.</p>
+                    <p class="cart__item-price"><span>1000,00 ₽</span></p>
+                    <p class="cart__item-amount"><span>{{priceFormat(finalAmount.expandBeton)}}</span></p>
+                  </div>
+                  <div class="cart__item-wrapper" v-if="finalAmount.narrow">
+                    <p class="cart__item">Уменьшение проема</p>
+                    <p class="cart__item-qty">{{ finalAmount.narrow / 400 }} м.п.</p>
+                    <p class="cart__item-price"><span>400,00 ₽</span></p>
+                    <p class="cart__item-amount"><span>{{priceFormat(finalAmount.narrow)}}</span></p>
+                  </div>
+                  <div class="cart__item-wrapper" v-if="finalAmount.jambs">
+                    <p class="cart__item">Монтаж доборов</p>
+                    <p class="cart__item-qty">{{ finalAmount.jambs / 1250 }} компл.</p>
+                    <p class="cart__item-price"><span>1250,00 ₽</span></p>
+                    <p class="cart__item-amount"><span>{{priceFormat(finalAmount.jambs)}}</span></p>
+                  </div>
+
+                  <div class="cart__item-wrapper" v-if="finalAmount.narrow">
+                    <p class="cart__item">Необходимо добавить брус 20x45</p>
+                    <p class="cart__item-qty">{{ finalAmount.narrow / 400 }} м.п.</p>
+                    <p class="cart__item-price"><span></span></p>
+                    <p class="cart__item-amount"><span></span></p>
+                  </div>
+                </div>
+                <div class="cart-map__contacts contacts">
+                  <div class="contacts__wrapper">
+                    <div class="contacts__item"><img src="./img/phone.svg" alt=""></div>
+                    <div class="contacts__description">
+                      <p>Умный дом</p>
+                      <a>+ 7 911 *** ** **</a>
+                    </div>
+                  </div>
+                  <div class="contacts__wrapper">
+                    <div class="contacts__item"><img src="./img/mail.svg" alt=""></div>
+                    <div class="contacts__description">
+                      <p>Почта</p>
+                      <a>umdom69@gmail.com</a>
+                    </div>
+                  </div>
+                  <div class="contacts__wrapper">
+                    <div class="contacts__item"><img src="./img/phone.svg" alt=""></div>
+                    <div class="contacts__description">
+                      <p>Белая кисть</p>
+                      <a>+ 7 911 *** ** **</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- <p class="cart__title" v-if="zone.price">Монтаж за пределами первой зоны: <span>{{priceFormat(zone.price)}}</span></p>
+          <p class="cart__title">Общее количество дверей: <span>{{cart.length}}</span></p>
+          <p class="cart__title">К оплате: 
+            <span v-if="zone.price">{{priceFormat(cartAmount)}} + {{priceFormat(zone.price)}}</span>
+            <span v-else>{{priceFormat(cartAmount)}}</span>
+          </p>
+          <div class="cart-item" v-for="(item, index) in cart">
+            <button class="cart-item__close-button button-cross" type="button" aria-label="Удалить"><span class="button-cross__icon"></span><span class="cart-item__close-button-interactive-area"></span>
+            </button>
+            <div class="product-info cart-item__info">
+              <p class="product-info__title" v-if="item.amountForm.covering == 3500">{{index + 1}}) Установка одной межкомнатной двери / одинарной раздвижной двери:</p>
+              <p class="product-info__title" v-else-if="item.amountForm.covering == 3900">{{index + 1}}) Установка дверей из массива и эмалированных:</p>
+              <p class="product-info__title" v-else-if="item.amountForm.covering == 2950">{{index + 1}}) Установка межкомнатных дверей (от 2-х дверей):</p>
+              <p>Сумма: <span>{{priceFormat(item.amountForm.covering)}}</span></p>
+            </div>
+            <div class="product-info cart-item__services">
+              <p class="cart-item__services-title">Дополнительные работы:</p>
+              <p class="product-info__info" v-if="item.amountForm.jamb">Монтаж доборов: <b>{{ priceFormat(item.amountForm.jamb) }}</b></p>
+              <p class="product-info__info" 
+              v-if="item.amountForm.narrowSide || item.amountForm.narrowTop">Уменьшение проема: 
+                <span>{{ priceFormat(item.amountForm.narrowSide + item.amountForm.narrowTop) }}</span>
+              </p>
+              <p class="product-info__info" 
+              v-if="item.amountForm.expandSide || item.amountForm.expandTop">Расширение проема: 
+                <span>{{ priceFormat(item.amountForm.expandSide + item.amountForm.expandTop) }}</span>
+              </p>
+            </div>
+
+            <div class="cart-item__price">Итого: <b>{{priceFormat(item.total)}}</b></div>
+            <div class="cart-item__message" v-if="item.amountForm.narrowSide || item.amountForm.narrowTop">Не забудьте добавить брус для уменьшения проема</div>
+          </div> -->
+          </div>
+          <div class="cart-nothing" v-else>
+            <h2>Корзина пока пуста</h2>
+            <button class="btn-cart-back" data-link="INTERRIOR" @click="navigate">Вернуться на главную</button>
+          </div>
+        </div>
+        <div class="map-wrapper" v-if="page === 'MAP'">
+          <div class="map-container">
+            <l-map ref="myMap" :center="mapOptions.center" :zoom="mapOptions.zoom" @ready="doSomethingOnReady()"
+              class="map" :min-zoom="mapOptions.minZoom" :max-zoom="mapOptions.maxZoom"
+              @click="mapClick($event, polygons.polygon1);">
+              <l-tile-layer :url="url" :attribution="attribution"
+                style="filter: hue-rotate(180deg) invert(100%);"></l-tile-layer>
+              <l-circle :lat-lng="circle.center" :radius="circle.radius" :color="circle.color"
+                :fill-color="circle.fillColor" @click="getPolygon(null, $event)"></l-circle>
+              <l-polygon :lat-lngs="polygons.polygon.latlngs" :color="polygons.polygon.color"
+                :fill-color="polygons.polygon.fillColor" @click="getPolygon(polygons.polygon, $event)"></l-polygon>
+
+              <l-polygon :lat-lngs="polygons.polygon2.latlngs" :color="polygons.polygon2.color"
+                :fill-color="polygons.polygon2.fillColor" @click="getPolygon(polygons.polygon2, $event)"></l-polygon>
+
+              <l-polygon :lat-lngs="polygons.polygon3.latlngs" :color="polygons.polygon3.color"
+                :fill-color="polygons.polygon3.fillColor" @click="getPolygon(polygons.polygon3, $event)"></l-polygon>
+
+              <l-polygon :lat-lngs="polygons.polygon4.latlngs" :color="polygons.polygon4.color"
+                :fill-color="polygons.polygon4.fillColor" @click="getPolygon(polygons.polygon4, $event)"></l-polygon>
+
+              <l-polygon :lat-lngs="polygons.polygon5.latlngs" :color="polygons.polygon5.color"
+                :fill-color="polygons.polygon5.fillColor" @click="getPolygon(polygons.polygon5, $event)"></l-polygon>
+
+              <l-polygon :lat-lngs="polygons.polygon6.latlngs" :color="polygons.polygon6.color"
+                :fill-color="polygons.polygon6.fillColor" @click="getPolygon(polygons.polygon6, $event)"></l-polygon>
+
+              <l-marker :lat-lng="marker.position" :lat-lng.sync="marker.position">
+                <l-icon :icon-size="dynamicSize" :icon-anchor="dynamicAnchor" :icon-url="dinamicPin" />
+              </l-marker>
+            </l-map>
+            <div class="map-table">
+              <ul class="map-table__list">
+                <li>№1: Доплата не требуется</li>
+                <li>№2: 400₽</li>
+                <li>№3: 800₽</li>
+                <li>№4: 1200₽</li>
+                <li>№5: 1600₽</li>
+                <li>№6: 2000₽</li>
+              </ul>
+            </div>
+          </div>
+          <div class="map-description">
+            <p>Установите маркер на интересующий вас адрес, <br />чтобы узнать стоимость в пределах определенной зоны.
+            </p>
+            <p>
+              <span class="map-price" v-if="zone.price">{{ zone.title }}. Доплата: {{ zone.price }}₽ </span>
+              <span class="map-price" v-else-if="zone.price !== 0">Монтаж и замер не производится.</span>
+              <span class="map-price" v-else> Доплата не требуется.</span>
+            </p>
+          </div>
+        </div>
+        <div class="calc__wrapper" v-if="page !== 'MAP' && page !== 'CART'" @click="closeMenu">
+          <h1 v-if="page === 'INTERRIOR'" class="calc__title">Калькулятор расчета межкомнатных дверей</h1>
+          <h1 v-else-if="page === 'EXTERRIOR'" class="calc__title">Калькулятор расчета входных дверей</h1>
+          <div class="calc__row" v-show="page === 'INTERRIOR'">
+            <form class="calc__form form" :class="{active: menu}">
+              <fieldset class="form__fieldset fieldset door">
+                <legend class="fieldset__legend">Коробка, <span>мм</span></legend>
+                <label for=""
+                  :class="{error: !$v.form.door.width.between || ($v.form.door.width.$dirty && !form.door.width)}">
+                  <p>Ширина</p>
+                  <input type="number" v-model.number="form.door.width" min="620" max="1480" required
+                    @input="$v.form.door.width.$touch">
+                  <small v-if="!$v.form.door.width.between">Не меньше {{$v.form.door.width.$params.between.min}} мм и не
+                    больше {{$v.form.door.width.$params.between.max}} мм</small>
+                  <small v-else-if="$v.form.door.width.$dirty && !form.door.width">Поле не должно быть пустым</small>
+                </label>
+                <label for=""
+                  :class="{error: !$v.form.door.height.between || ($v.form.door.height.$dirty && !form.door.height)}">
+                  <p>Высота</p>
+                  <input type="number" v-model.number="form.door.height" min="2020" max="2100" required
+                    @input="$v.form.door.height.$touch">
+                  <small v-if="!$v.form.door.height.between">Не меньше {{$v.form.door.height.$params.between.min}} мм и
+                    не
+                    больше {{$v.form.door.height.$params.between.max}} мм</small>
+                  <small v-else-if="$v.form.door.height.$dirty && !form.door.height">Поле не должно быть пустым</small>
+                </label>
+                <label for=""
+                  :class="{error: !$v.form.door.depth.between || ($v.form.door.depth.$dirty && !form.door.depth)}">
+                  <p>Глубина</p>
+                  <input type="number" v-model.number="form.door.depth" min="68" max="80" required
+                    @input="$v.form.door.depth.$touch">
+                  <small v-if="!$v.form.door.depth.between">Не меньше {{$v.form.door.depth.$params.between.min}} мм и не
+                    больше {{$v.form.door.depth.$params.between.max}} мм</small>
+                  <small v-else-if="$v.form.door.depth.$dirty && !form.door.depth">Поле не должно быть пустым</small>
+                </label>
+              </fieldset>
+
+              <fieldset class="form__fieldset fieldset doorone">
+                <legend class="fieldset__legend">Проем, <span>мм</span></legend>
+                <label for=""
+                  :class="{error: !$v.form.doorone.width.between || ($v.form.doorone.width.$dirty && !form.doorone.width)}">
+                  <p>Ширина</p>
+                  <input type="number" v-model.number="form.doorone.width" min="600" max="1500" required
+                    @input="$v.form.doorone.width.$touch">
+                  <small v-if="!$v.form.doorone.width.between">Не меньше {{$v.form.doorone.width.$params.between.min}}
+                    мм
+                    и не больше {{$v.form.doorone.width.$params.between.max}} мм</small>
+                  <small v-else-if="$v.form.doorone.width.$dirty && !form.doorone.width">Поле не должно быть
+                    пустым</small>
+                </label>
+                <label for=""
+                  :class="{error: !$v.form.doorone.height.between || ($v.form.doorone.height.$dirty && !form.doorone.height)}">
+                  <p>Высота</p>
+                  <input type="number" v-model.number="form.doorone.height" min="2000" max="2130" required
+                    @input="$v.form.doorone.height.$touch">
+                  <small v-if="!$v.form.doorone.height.between">Не меньше {{$v.form.doorone.height.$params.between.min}}
+                    мм и не больше {{$v.form.doorone.height.$params.between.max}} мм</small>
+                  <small v-else-if="$v.form.doorone.height.$dirty && !form.doorone.height">Поле не должно быть
+                    пустым</small>
+                </label>
+                <label for=""
+                  :class="{error: !$v.form.doorone.depth.between || ($v.form.doorone.depth.$dirty && !form.doorone.depth)}">
+                  <p>Глубина</p>
+                  <input type="number" v-model.number="form.doorone.depth" min="68" max="450" required
+                    @input="$v.form.doorone.depth.$touch">
+                  <small v-if="!$v.form.doorone.depth.between">Не меньше {{$v.form.doorone.depth.$params.between.min}}
+                    мм
+                    и не больше {{$v.form.doorone.depth.$params.between.max}} мм</small>
+                  <small v-else-if="$v.form.doorone.depth.$dirty && !form.doorone.depth">Поле не должно быть
+                    пустым</small>
+                </label>
+              </fieldset>
+
+              <fieldset class="form__fieldset fieldset type-door">
+                <legend class="fieldset__legend">Тип коробки</legend>
+
+                <label for="" @click="jamb = 'DEFAULT'">
+                  <input type="radio" name="type-door" value="DEFAULT" v-model="jamb">
+                  <span>Стандартная</span>
+                </label>
+
+                <label for="" @click="jamb = 'TELESCOPE'">
+                  <input type="radio" name="type-door" value="TELESCOPE" v-model="jamb">
+                  <span>Телескопическая</span>
+                </label>
+              </fieldset>
+
+              <fieldset class="form__fieldset fieldset jamb">
+                <legend class="fieldset__legend">Добор</legend>
+                <select v-if="!getJambRepair" name="jamb" id="jamb" v-model.number="planc">
+                  <option value="0">{{null}}</option>
+                </select>
+                <select v-else name="jamb" id="jamb" v-model.number="planc">
+                  <option value="100">100мм</option>
+                  <option value="120">120мм</option>
+                  <option value="150">150мм</option>
+                </select>
+                <small v-if="getJambRepair && !planc">Необходимо выбрать добор</small>
+              </fieldset>
+            </form>
+            <div class="calc__services services">
+              <!-- <ul class="tabs-list" @click="changeInterriorTabs">
+              <li class="tabs-indicator" :class="{active: interriorTabs === 'OPTIONAL'}"></li>
+              <li class="tabs" :class="{active: interriorTabs === 'SERVICES'}">Услуги</li>
+              <li class="tabs" :class="{active: interriorTabs === 'OPTIONAL'}">Дополнительные услуги</li>
+            </ul> -->
+              <div class="services__block">
+                <div class="services-slider" :class="{active: interriorTabs === 'OPTIONAL'}">
+
+                  <div class="services__list list services-basic" :class="{active: menu}">
+                    <h3 class="services__title">Услуги</h3>
+                    <ul>
+                      <li>
+                        <p class="covering-title">Тип покрытия двери</p>
+                        <div class="covering-type-list">
+                          <span v-for="item of doorCovering" class="covering-item" :key="item.id"
+                            @click="changeCoveringType(item.id)" :class="{active: item.active}">{{item.title}}
+                            <strong>{{priceFormat(item.price)}}</strong>
+                          </span>
+                        </div>
+                      </li>
+                      <li>
+                        <p class="covering-title">Тип проема</p>
+                        <div class="covering-type-list toggle-btn">
+                          <span :class="{colorBlue: !typeMaterial}">Бетон</span>
+                          <label class="toggle-control">
+                            <input type="checkbox" v-model="typeMaterial">
+                            <span class="control"></span>
+                          </label>
+                          <span :class="{colorBlue: typeMaterial}">Другое</span>
+                        </div>
+                      </li>
+                      <li v-if="expansionOpeningTheSide" :class="{success: getSideExtention}">
+                        <label for="">
+                          <p> Расширение проема сбоку ({{getDooroneDepthMeters ? getDooroneDepthMeters * 2 : 2}} м/п)
+                            <span class="price" v-if="typeMaterial">{{ priceFormat(750) }} * {{getDooroneDepthMeters ?
+                              getDooroneDepthMeters * 2 : 2}} = {{
+                              priceFormat(amountForm.expandSide) }}</span>
+                            <span class="price" v-else>{{ priceFormat(1000) }} * {{getDooroneDepthMeters ?
+                              getDooroneDepthMeters * 2 : 2}} = {{ priceFormat(amountForm.expandSide)
+                              }}</span>
+                          </p>
+                          <input type="text" readonly disabled
+                            :value="getSideExtention ? 'Разница ширины по коробке с проемом менее 20мм' : ''"
+                            :class="{success: getSideExtention}">
+                        </label>
+                      </li>
+                      <li v-if="expansionOpeningTop" :class="{success: getTopExtention}">
+                        <label for="">
+                          <p> Расширение проема сверху ({{getDooroneDepthMeters ? getDooroneDepthMeters : 1}} м/п)
+                            <span class="price" v-if="typeMaterial">{{ priceFormat(750) }} * {{getDooroneDepthMeters ?
+                              getDooroneDepthMeters : 1}} = {{
+                              priceFormat(amountForm.expandTop) }}</span>
+                            <span class="price" v-else>{{ priceFormat(1000) }} * {{getDooroneDepthMeters ?
+                              getDooroneDepthMeters : 1}} = {{ priceFormat(amountForm.expandTop)
+                              }}</span>
+                          </p>
+                          <input type="text" readonly disabled
+                            :value="'Разница высоты по коробке с проемом менее 10мм (проем ровный)' " class="success">
+                        </label>
+                      </li>
+                      <li v-if="reducingOpeningTheSide" :class="{success: getSideNarrow}">
+                        <label for="">
+                          <p v-if="form.doorone.width - form.door.width <= 90">Уменьшение проема сбоку (с одной строны)
+                            (2
+                            м/п)
+                            <span class="price">{{ priceFormat(400) }} * 2 = {{
+                              priceFormat(amountForm.narrowSide)}}</span>
+                          </p>
+                          <p v-else-if="form.doorone.width - form.door.width > 90">Уменьшение проема сбоку (с двух
+                            сторон)
+                            (4 м/п)
+                            <span class="price">{{ priceFormat(400) }} * 4 = {{
+                              priceFormat(amountForm.narrowSide)}}</span>
+                          </p>
+                          <input v-if="form.doorone.width - form.door.width <= 90" type="text" readonly disabled
+                            class="success" value="Разница ширины по коробке с проемом более 60 мм">
+                          <input v-else-if="form.doorone.width - form.door.width > 90" type="text" readonly disabled
+                            class="success" value="Разница ширины по коробке с проемом более 90 мм">
+                        </label>
+                      </li>
+                      <li v-if="reducingOpeningTop" :class="{success: getTopNarrow}">
+                        <label for="">
+                          <p>Уменьшение проема сверху (1 м/п)
+                            <span class="price">{{ priceFormat(400) }} * 1 = {{priceFormat(reducingOpeningTop)}}</span>
+                          </p>
+                          <input type="text" readonly disabled
+                            :value="getTopNarrow ? 'Разница высоты по коробке с проемом более 30 мм либо приподнять короб' : ''"
+                            :class="{success: getTopNarrow}">
+                        </label>
+                      </li>
+                      <li v-if="jambPrice" :class="{success: getJambRepair}">
+                        <label for="">
+                          <p>Монтаж комплекта доборов ({{ getJambCount }} компл.)
+                            <span class="price">{{ priceFormat(1250) }} * {{getJambCount}} = {{
+                              priceFormat(jambPrice)}}</span>
+                          </p>
+                          <input type="text" readonly disabled :value="getJambRepair ? 
+                        `Разница глубин проема и коробки больше чем на ${getJambRepair} мм` : ''"
+                            :class="{success: getJambRepair}">
+                        </label>
+                      </li>
+                      <!-- <li v-if="getCuttJamb" :class="{success: getCuttJamb}">
+                      <label for="">
+                        <p>Распил доборов
+                          <span v-if="getCuttJamb">(3 шт.)</span>
+                        </p>
+                        <input type="text" readonly disabled :value="getCuttJamb ? 'Распил доборов' : ''"
+                          :class="{success: getCuttJamb}">
+                      </label>
+                    </li> -->
+                    </ul>
+                    <div class="services__result result">
+                      <p>Итого: <span>{{priceFormat(getAmount)}}</span></p>
+                      <span class="result-description">Цена за монтаж одной двери</span>
+                      <button v-if="!$v.form.$invalid && (getJambRepair ? planc : true)" class="add-cart-btn"
+                        title="Добавить расчет в корзину" @click="showAndHideModalAddCart">
+                        Добавить
+                      </button>
+                      <button v-else class="add-cart-btn disabled" disabled
+                        title="Заполните все обязательные поля формы">
+                        Добавить
+                      </button>
+                    </div>
+                  </div>
+                  <div class="services__list list services-optional">
+                    <!-- <h3 class="services__title">Дополнительные услуги</h3>
+                  <form class="interrior-optional">
+                    <fieldset>
+                      <legend class="fieldset__legend">Монтаж порога</legend>
+
+                      <label for="" @click="jamb = 'DEFAULT'">
+                        <input type="checkbox" name="type-door" value="DEFAULT">
+                      </label>
+                    </fieldset>
+
+                    <fieldset>
+                      <legend class="fieldset__legend">Распил наличника</legend>
+
+                      <label for="" @click="jamb = 'DEFAULT'">
+                        <input type="checkbox" name="type-door" value="DEFAULT">
+                      </label>
+                    </fieldset>
+                  </form> -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="calc__row" v-show="page === 'EXTERRIOR'">
+            <form class="calc__form form" :class="{active: menu}">
+              <fieldset class="form__fieldset fieldset door">
+                <legend class="fieldset__legend">Коробка, <span>мм</span></legend>
+                <label for=""
+                  :class="{error: !$v.exterriorForm.door.width.between || ($v.exterriorForm.door.width.$dirty && !exterriorForm.door.width)}">
+                  <p>Ширина</p>
+                  <input type="number" v-model.number="exterriorForm.door.width" min="620" max="1480" required
+                    @input="$v.exterriorForm.door.width.$touch">
+                  <small v-if="!$v.exterriorForm.door.width.between">Не меньше
+                    {{$v.exterriorForm.door.width.$params.between.min}} мм и не
+                    больше {{$v.exterriorForm.door.width.$params.between.max}} мм</small>
+                  <small v-else-if="$v.exterriorForm.door.width.$dirty && !exterriorForm.door.width">Поле не должно быть
+                    пустым</small>
+                </label>
+                <label for=""
+                  :class="{error: !$v.exterriorForm.door.height.between || ($v.exterriorForm.door.height.$dirty && !exterriorForm.door.height)}">
+                  <p>Высота</p>
+                  <input type="number" v-model.number="exterriorForm.door.height" min="2020" max="2100" required
+                    @input="$v.exterriorForm.door.height.$touch">
+                  <small v-if="!$v.exterriorForm.door.height.between">Не меньше
+                    {{$v.exterriorForm.door.height.$params.between.min}} мм и
+                    не
+                    больше {{$v.exterriorForm.door.height.$params.between.max}} мм</small>
+                  <small v-else-if="$v.exterriorForm.door.height.$dirty && !exterriorForm.door.height">Поле не должно
+                    быть
+                    пустым</small>
+                </label>
+              </fieldset>
+              <fieldset class="form__fieldset fieldset doorone">
+                <legend class="fieldset__legend">Проем, <span>мм</span></legend>
+                <label for=""
+                  :class="{error: !$v.exterriorForm.doorone.width.between || ($v.exterriorForm.doorone.width.$dirty && !exterriorForm.doorone.width)}">
+                  <p>Ширина</p>
+                  <input type="number" v-model.number="exterriorForm.doorone.width" min="600" max="1500" required
+                    @input="$v.exterriorForm.doorone.width.$touch">
+                  <small v-if="!$v.exterriorForm.doorone.width.between">Не меньше
+                    {{$v.exterriorForm.doorone.width.$params.between.min}}
+                    мм
+                    и не больше {{$v.exterriorForm.doorone.width.$params.between.max}} мм</small>
+                  <small v-else-if="$v.exterriorForm.doorone.width.$dirty && !exterriorForm.doorone.width">Поле не
+                    должно
+                    быть
+                    пустым</small>
+                </label>
+                <label for=""
+                  :class="{error: !$v.exterriorForm.doorone.height.between || ($v.exterriorForm.doorone.height.$dirty && !exterriorForm.doorone.height)}">
+                  <p>Высота</p>
+                  <input type="number" v-model.number="exterriorForm.doorone.height" min="2000" max="2130" required
+                    @input="$v.exterriorForm.doorone.height.$touch">
+                  <small v-if="!$v.exterriorForm.doorone.height.between">Не меньше
+                    {{$v.exterriorForm.doorone.height.$params.between.min}}
+                    мм и не больше {{$v.exterriorForm.doorone.height.$params.between.max}} мм</small>
+                  <small v-else-if="$v.exterriorForm.doorone.height.$dirty && !exterriorForm.doorone.height">Поле не
+                    должно быть
+                    пустым</small>
+                </label>
+              </fieldset>
+              <fieldset class="form__fieldset fieldset type-door">
+                <legend class="fieldset__legend">Вес двери</legend>
+                <label for="">
+                  <input type="radio" name="type-door" value="DEFAULT" v-model="jamb">
+                  <span>До 95кг</span>
+                </label>
+                <label for="">
+                  <input type="radio" name="type-door" value="TELESCOPE" v-model="jamb">
+                  <span>От 95кг</span>
+                </label>
+              </fieldset>
+            </form>
+            <div class="calc__services services">
+              <div class="services__block">
+                <h3 class="services__title">Услуги</h3>
+                <ul class="services__list list">
+                  <li>
+                    <label for="">
+                      <p>Установка входной двери</p>
+                      <select class="material">
+                        <option value="">Установка входной двери до 95кг</option>
+                        <option value="">Установка входной двери от 95кг</option>
+                      </select>
+                    </label>
+                  </li>
+                  <li v-if="getSideExtention" :class="{success: getSideExtention}">
+                    <label for="">
+                      <p>Расширение проема сбоку
+                        <span v-if="getSideExtention">(2 м/п)</span>
+                      </p>
+                      <input type="text" readonly disabled
+                        :value="getSideExtention ? 'Разница ширины по коробке с проемом менее 20мм' : ''"
+                        :class="{success: getSideExtention}">
+                    </label>
+                  </li>
+                  <li v-if="getTopExtention" :class="{success: getTopExtention}">
+                    <label for="">
+                      <p>Расширение проема сверху
+                        <span v-if="getTopExtention">(1 м/п)</span>
+                      </p>
+                      <input type="text" readonly disabled
+                        :value="getTopExtention ? 'Разница высоты по коробке с проемом менее 10мм (проем ровный)' : ''"
+                        :class="{success: getTopExtention}">
+                    </label>
+                  </li>
+                  <li v-if="getSideNarrow" :class="{success: getSideNarrow}">
+                    <label for="">
+                      <p>Уменьшение проема сбоку
+                        <span v-if="form.doorone.width - form.door.width <= 90">(с одной строны) (2 м/п)</span>
+                        <span v-else-if="form.doorone.width - form.door.width > 90">(с двух сторон) (4 м/п)</span>
+                      </p>
+                      <input v-if="form.doorone.width - form.door.width <= 90" type="text" readonly disabled
+                        class="success" value="Разница ширины по коробке с проемом более 60 мм">
+
+                      <input v-else-if="form.doorone.width - form.door.width > 90" type="text" readonly disabled
+                        class="success" value="Разница ширины по коробке с проемом более 90 мм">
+                    </label>
+                  </li>
+                  <li v-if="getTopNarrow" :class="{success: getTopNarrow}">
+                    <label for="">
+                      <p>Уменьшение проема сверху
+                        <span v-if="getTopNarrow">(1 м/п)</span>
+                      </p>
+                      <input type="text" readonly disabled
+                        :value="getTopNarrow ? 'Разница высоты по коробке с проемом более 30 мм либо приподнять короб' : ''"
+                        :class="{success: getTopNarrow}">
+                    </label>
+                  </li>
+                  <li v-if="getJambCount && getJambRepair" :class="{success: getJambRepair}">
+                    <label for="">
+                      <p>Монтаж комплекта доборов <span v-if="getJambCount && getJambRepair">({{ getJambCount }}
+                          компл.)</span></p>
+                      <input type="text" readonly disabled :value="getJambRepair ? 
+                    `Разница глубин проема и коробки больше чем на ${getJambRepair} мм` : ''"
+                        :class="{success: getJambRepair}">
+                    </label>
+                  </li>
+                  <li v-if="getCuttJamb" :class="{success: getCuttJamb}">
+                    <label for="">
+                      <p>Распил доборов
+                        <span v-if="getCuttJamb">(3 шт.)</span>
+                      </p>
+                      <input type="text" readonly disabled :value="getCuttJamb ? 'Распил доборов' : ''"
+                        :class="{success: getCuttJamb}">
+                    </label>
+                  </li>
+                </ul>
+                <div class="services__result result">
+                  <!-- <p>Итого:</p> -->
+                  <a href="" class="print-btn" @click.prevent="">Добавить</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="calc__preview preview" :class="{active: menu}" v-if="page === 'INTERRIOR'">
+          <div class="preview__wrapper">
+            <div class="preview__doorone preview__block">
+              <h3 class="preview__title">Размер по коробке</h3>
+              <div class="preview__row">
+                <label for="interrior-preview-height"
+                  :class="{error: !$v.form.door.height.between || ($v.form.door.height.$dirty && !form.door.height)}">
+                  <p>Высота</p>
+                  <input name="interrior-preview-height" type="text" readonly disabled
+                    :value="form.door.height ? `${form.door.height} мм` : 'мм'">
+                </label>
+                <picture class="preview__picture picture">
+                  <img src="./img/door.png" alt="door">
+                </picture>
+                <label for="interrior-preview-depth"
+                  :class="{error: !$v.form.door.depth.between || ($v.form.door.depth.$dirty && !form.door.depth)}">
+                  <p>Глубина</p>
+                  <input name="interrior-preview-depth" type="text" readonly disabled
+                    :value="form.door.depth ? `${form.door.depth} мм` : 'мм'">
+                </label>
+              </div>
+              <div class="preview__row">
+                <label for="interrior-preview-width"
+                  :class="{error: !$v.form.door.width.between || ($v.form.door.width.$dirty && !form.door.width)}">
+                  <p>Ширина</p>
+                  <input name="interrior-preview-width" type="text" readonly disabled
+                    :value="form.door.width ? `${form.door.width} мм` : 'мм'">
+                </label>
+              </div>
+            </div>
+            <div class="preview__door preview__block">
+              <h3 class="preview__title">Размер проема</h3>
+              <div class="preview__row">
+                <label for=""
+                  :class="{error: !$v.form.doorone.height.between || ($v.form.doorone.height.$dirty && !form.doorone.height)}">
+                  <p>Высота</p>
+                  <input type="text" readonly disabled
+                    :value="form.doorone.height ? `${form.doorone.height} мм` : 'мм'">
+                </label>
+                <picture class="preview__picture picture">
+                  <img src="./img/doorone.png" alt="door">
+                </picture>
+                <label for=""
+                  :class="{error: !$v.form.doorone.depth.between || ($v.form.doorone.depth.$dirty && !form.doorone.depth)}">
+                  <p>Глубина</p>
+                  <input type="text" readonly disabled :value="form.doorone.depth ? `${form.doorone.depth} мм` : 'мм'">
+                </label>
+              </div>
+              <div class="preview__row">
+                <label for=""
+                  :class="{error: !$v.form.doorone.width.between || ($v.form.doorone.width.$dirty && !form.doorone.width)}">
+                  <p>Ширина</p>
+                  <input type="text" readonly disabled :value="form.doorone.width ? `${form.doorone.width} мм` : 'мм'">
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="calc__preview preview" v-show="page === 'EXTERRIOR'">
+          <div class="preview__wrapper">
+            <div class="preview__doorone preview__block">
+              <h3 class="preview__title">Размер по коробке</h3>
+              <div class="preview__row">
+                <label for="">
+                  <p>Высота</p>
+                  <input type="text" readonly disabled
+                    :value="exterriorForm.door.height ? `${exterriorForm.door.height} мм` : 'мм'">
+                </label>
+                <picture class="preview__picture picture">
+                  <img src="./img/door.png" alt="door">
+                </picture>
+                <label for="" class="hidden">
+                  <p>Глубина</p>
+                  <input type="text" readonly disabled>
+                </label>
+              </div>
+              <div class="preview__row">
+                <label for="">
+                  <p>Ширина</p>
+                  <input type="text" readonly disabled
+                    :value="exterriorForm.door.width ? `${exterriorForm.door.width} мм` : 'мм'">
+                </label>
+              </div>
+            </div>
+            <div class="preview__door preview__block">
+              <h3 class="preview__title">Размер проема</h3>
+              <div class="preview__row">
+                <label for="">
+                  <p>Высота</p>
+                  <input type="text" readonly disabled
+                    :value="exterriorForm.doorone.height ? `${exterriorForm.doorone.height} мм` : 'мм'">
+                </label>
+                <picture class="preview__picture picture">
+                  <img src="./img/doorone.png" alt="door">
+                </picture>
+                <label for="" class="hidden">
+                  <p>Глубина</p>
+                  <input type="text" readonly disabled>
+                </label>
+              </div>
+              <div class="preview__row">
+                <label for="">
+                  <p>Ширина</p>
+                  <input type="text" readonly disabled
+                    :value="exterriorForm.doorone.width ? `${exterriorForm.doorone.width} мм` : 'мм'">
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div v-show="modalAddCart" class="modal modal-for-ui-kit" :class="{isActive: modalAddCart}">
+        <div class="modal__wrapper">
+          <div class="modal__overlay" data-close-modal></div>
+          <div class="modal__content">
+            <h2 class="modal__header title title--medium">Добавить расчет в корзину</h2>
+            <div class="modal__info">
+              <div class="modal__info-wrapper">
+                <p><b>Коробка:</b> <span>{{form.door.width}}мм х {{form.door.height}}мм х {{form.door.depth}}мм</span>
+                </p>
+                <p><b>Проем:</b> <span>{{form.doorone.width}}мм х {{form.doorone.height}}мм х
+                    {{form.doorone.depth}}мм</span></p>
+                <p class="modal__price-wrapper"><span class="modal__price"><b>Цена:</b></span>
+                  <span class="modal__price">{{priceFormat(getAmount * addItemCount)}}</span>
+                </p>
+              </div>
+              <div class="modal__item-count">
+                <span class="minus" @click="decItemCount">-</span>
+                <input :value="addItemCount" readonly>
+                <span class="plus" @click="incItemCount">+</span>
+              </div>
+            </div>
+            <div class="modal__button-container">
+              <button class="button button--blue button--big modal__button modal__button--add"
+                @click="addCalcToTheCart">Добавить в корзину</button>
+            </div>
+            <button class="modal__close-btn button-cross" type="button" aria-label="Закрыть"
+              @click="showAndHideModalAddCart">
+              <span class="button-cross__icon"></span>
+              <span class="modal__close-btn-interactive-area"></span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="https://unpkg.com/dexie/dist/dexie.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
+  <script src="vue.js"></script>
+  <script src="leaflet.js"></script>
+  <script src="vue2-leaflet.js"></script>
+  <script src="vuelidate.min.js"></script>
+  <script src="validators.min.js"></script>
+  <script src="spb-zone1.js"></script>
+  <script src="spb-zone2.js"></script>
+  <script src="spb-zone3.js"></script>
+  <script src="spb-zone4.js"></script>
+  <script src="spb-zone5.js"></script>
+  <script src="spb-zone6.js"></script>
+  <script src="consts.js"></script>
+  <script src="app.js"></script>
+</body>
+
+</html>

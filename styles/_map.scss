@@ -1,0 +1,87 @@
+.map-wrapper {
+    min-height: calc(100vh - 94px);
+    width: 100%;
+}
+
+.map {
+    min-height: 700px;
+    width: 100%;
+}
+
+.map-container {
+    max-height: 700px;
+    overflow: hidden;
+    position: relative;
+    border: 2px solid $color-blue;
+    border-radius: 20px;
+}
+
+.map-description {
+    color: grey;
+    margin-top: 2rem;
+}
+
+.map-price {
+    color: $color-blue;
+    font-weight: bold;
+}
+
+.map-table {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 500;
+    width: 400px;
+    height: 100%;
+    background-color: $color-blue;
+    padding: 20px;
+    color: $color-white;
+    border-left: 2px solid $color-blue;
+}
+
+.map-table__list {
+    & li {
+        position: relative;
+        margin: 20px 0 20px 30px;
+
+        &::before {
+            content: '';
+            width: 25px;
+            height: 25px;
+            position: absolute;
+            left: -35px;
+            bottom: -4px;
+            border-radius: 50%;
+        }
+
+        &:nth-child(1)::before {
+            background-color: rgba(255, 255, 0, 0.7);
+            border: 2px solid rgb(255, 255, 0);
+        }
+
+        &:nth-child(2)::before {
+            background-color: rgba(255, 0, 0, 0.7);
+            border: 2px solid rgb(255, 0, 0);
+        }
+
+        &:nth-child(3)::before {
+            background-color: rgba(255, 140, 0, 0.7);
+            border: 2px solid rgb(255, 140, 0);
+        }
+
+        &:nth-child(4)::before {
+            background-color: rgba(0, 255, 255, 0.7);
+            border: 2px solid rgb(0, 255, 255);
+        }
+
+        &:nth-child(5)::before {
+            background-color: rgba(0, 128, 0, 0.7);
+            border: 2px solid rgb(0, 128, 0);
+        }
+
+        &:nth-child(6)::before {
+            background-color: rgba(165, 42, 42, 0.7);
+            border: 2px solid rgb(165, 42, 42);
+        }
+    }
+}
